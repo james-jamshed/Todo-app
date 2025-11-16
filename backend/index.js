@@ -10,7 +10,7 @@ app.use(express.json());
 
 app.use('/api/tasks', tasksRouter);
 
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI;
 
 mongoose.connect(MONGO_URI, {
