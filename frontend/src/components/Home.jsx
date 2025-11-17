@@ -1,7 +1,6 @@
 import { format } from "date-fns";
 import React, { useState } from "react";
 
-
 const COLORS = {
   blueDark: "#3E4CB9",
   bluePrimary: "#4F6AF3",
@@ -81,7 +80,6 @@ function TaskRow({ task, onToggle, onEdit, onDelete }) {
   );
 }
 
-
 export default function Home({
   tasks = [],
   onAddClick,
@@ -91,30 +89,37 @@ export default function Home({
   onSearch,
 }) {
 
-  // ---------- TODAY’S TASKS ----------
-  const todayStr = new Date().toDateString();
-  const todayTasks = tasks.filter(t => new Date(t.date).toDateString() === todayStr);
+  // TODAY TASKS
+  const todayISO = new Date().toISOString().slice(0, 10);
 
+  const todayTasks = tasks.filter(t =>
+    (t.date || "").slice(0, 10) === todayISO
+  );
 
   const [showAll, setShowAll] = useState(false);
   const tasksToShow = showAll ? todayTasks : todayTasks.slice(0, 5);
 
-  // ---------- WEEKLY PROGRESS ----------
+  // WEEKLY PROGRESS
   const now = new Date();
+
   const monday = new Date(now);
-  const day = monday.getDay();
-  monday.setDate(monday.getDate() - (day === 0 ? 6 : day - 1));
+  const wd = monday.getDay();
+  monday.setDate(monday.getDate() - (wd === 0 ? 6 : wd - 1));
 
   const sunday = new Date(monday);
   sunday.setDate(monday.getDate() + 6);
 
+  const mondayISO = monday.toISOString().slice(0, 10);
+  const sundayISO = sunday.toISOString().slice(0, 10);
+
   const weeklyTasks = tasks.filter(t => {
-    const d = new Date(t.date);
-    return d >= monday && d <= sunday;
+    const d = (t.date || "").slice(0, 10);
+    return d >= mondayISO && d <= sundayISO;
   });
 
   const weeklyCompleted = weeklyTasks.filter(t => t.status === "Completed").length;
   const weeklyPending = weeklyTasks.length - weeklyCompleted;
+
   const weeklyProgress = weeklyTasks.length
     ? Math.round((weeklyCompleted / weeklyTasks.length) * 100)
     : 0;
@@ -157,7 +162,6 @@ export default function Home({
 
         </div>
 
-
         {/* WEEKLY PROGRESS */}
         <p className="mt-6 font-semibold text-sm">Weekly Progress</p>
 
@@ -172,8 +176,7 @@ export default function Home({
           </div>
         </div>
 
-
-        {/* TASKS TODAY HEADER */}
+        {/* Today Tasks Header */}
         <div className="flex justify-between mt-6 items-center">
           <p className="font-bold text-sm">Tasks Today</p>
 
@@ -185,8 +188,7 @@ export default function Home({
           </button>
         </div>
 
-
-        {/* TASK LIST */}
+        {/* Task List */}
         <div className="mt-4 space-y-3">
           {tasksToShow.length === 0 && (
             <p className="text-gray-400 text-sm">No tasks for today</p>
@@ -205,7 +207,7 @@ export default function Home({
 
         <div style={{ height: 80 }} />
 
-        
+        {/* Floating Add Button */}
         <button
           onClick={onAddClick}
           className="fixed bottom-8 left-1/2 -translate-x-1/2 w-16 h-16 bg-blue-600 rounded-full text-white text-4xl shadow-xl flex items-center justify-center cursor-pointer"
